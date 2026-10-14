@@ -1,0 +1,19 @@
+\chapter{Introduction}\label{chapter:introduction}
+
+Large language models (LLMs) have made significant advances and support various applications such as conversational assistants, document analysis, and code generation. LLMs generate text autoregressively, using information from preceding text (the prompt and previously generated tokens) to compute the next output token. Modern LLM inference systems commonly use a \emph{key-value cache} (KV-cache) to accelerate token generation. At each generation step, the model reuses the cached keys and values of preceding tokens stored in memory for attention computation, avoiding the computational cost of recomputing these states~\cite{kv_kwon2023pagedattention}.
+
+Storing, accessing, and managing the KV-cache are key concerns in LLM inference systems. First, the KV-cache consumes substantial memory~\cite{kv_kwon2023pagedattention,kv_liu2024kivi}. Limited GPU memory severely restricts the number of requests that can run concurrently and can leave computational resources underutilized. This pressure is further intensified by the demand for longer context windows---reaching one million tokens in some models---to support complex tasks~\cite{kv_yang2025contextparallelism}. For a fixed model and cache format, KV-cache size grows linearly with sequence length, making its storage increasingly demanding. Its large size also makes repeated cache access during token generation memory-intensive~\cite{kv_liu2024kivi}. Finally, requests in applications such as multi-turn conversations, question answering over articles, and collaboration among agents can share substantial portions of their context. Locating reusable KV-cache entries, scheduling requests to use them, and sharing them across requests remain major challenges for modern LLM inference systems~\cite{kv_zheng2024sglang,kv_qin2025mooncake}.
+
+In this survey, we use \emph{KV-cache infrastructure} to denote the methods and system components that represent, store, access, and manage cached keys and values during LLM inference, the process of running a trained model to produce outputs. This scope includes techniques that reduce the amount of cached data, mechanisms that organize and move it across memory and storage devices, and policies that determine when to retain, reuse, or discard it. It also includes decisions about where requests run when those decisions depend on the availability of cached data. Together, these functions connect the cache used by the model with the resources needed to support it.
+
+We organize the literature around three questions: 
+\begin{itemize}
+    \item What information should the cache retain and in what form; 
+    \item How should that information be stored and accessed; 
+    \item When and by which requests should it be reused?
+\end{itemize}
+These questions cover changes to the model's cache requirements as well as cache management within and across servers. For each group of techniques, we review representative designs, compare their benefits and costs, and discuss the conditions under which they are useful.
+
+% Chapter numbers follow the agreed survey outline; use cross-references once
+% the remaining chapters have been added to the project.
+The remainder of this survey is organized as follows. Chapter~\ref{chapter:background} explains how the KV-cache works and introduces the management challenges and classification framework. Chapter~3 reviews existing techniques and systems within this framework. Chapter~4 discusses open research challenges, and Chapter~5 concludes the survey.
